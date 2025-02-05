@@ -15,7 +15,7 @@ use rand::{rngs::StdRng, Rng, RngCore, SeedableRng};
 use starknet::providers::Url;
 use starknet_types_core::felt::Felt;
 use starknet_types_rpc::{BlockId, BlockTag};
-use tracing::Level;
+use tracing::{info, Level};
 
 #[tokio::main]
 async fn main() {
@@ -76,7 +76,8 @@ async fn main() {
 
     let mut initial_block_number = hive.provider().block_number().await.unwrap();
 
-    // Step 5: Wait for a new block to start with a clean slate
+    // Step 5: Wait for a new block to start with a clean state
+    info!("Waiting for a new block to start with a clean state");
     loop {
         let current_block_number = hive.provider().block_number().await.unwrap();
         if current_block_number > initial_block_number {
@@ -92,6 +93,8 @@ async fn main() {
         .get_nonce(BlockId::Tag(BlockTag::Pending), hive.address())
         .await
         .unwrap();
+    info!("Executing multiple transactions with nonce in new block");
+
     loop {
         println!("Nonce before tx: {}", nonce);
         hive.execute_v3(vec![increase_balance_call.clone()])
